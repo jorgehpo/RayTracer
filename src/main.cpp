@@ -7,6 +7,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION // Do not include this line twice in your project!
 #include "stb_image_write.h"
 #include "utils.h"
+#include "Scene.h"
 
 // Shortcut to avoid Eigen:: and std:: everywhere, DO NOT USE IN .h
 using namespace std;
@@ -92,6 +93,7 @@ void part2()
 
 int main()
 {
+    Scene s;
     part1();
     part2();
 

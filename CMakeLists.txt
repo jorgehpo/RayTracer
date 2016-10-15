@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.12)
-project(Assignment1)
+project(RayTracer)
 
 ### Output directories
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
@@ -26,5 +26,5 @@ file(GLOB SOURCES
 "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
 
-add_executable(${PROJECT_NAME}_bin ${SOURCES})
+add_executable(${PROJECT_NAME}_bin ${SOURCES} src/Ray.cpp src/Ray.h src/Surface.cpp src/Surface.h src/Sphere.cpp src/Sphere.h)
  
