@@ -26,5 +26,5 @@ file(GLOB SOURCES
 "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
 
-add_executable(${PROJECT_NAME}_bin ${SOURCES} src/Ray.cpp src/Ray.h src/Surface.cpp src/Surface.h src/Sphere.cpp src/Sphere.h)
+add_executable(${PROJECT_NAME}_bin ${SOURCES} src/Ray.cpp src/Ray.h src/Surface.cpp src/Surface.h src/Sphere.cpp src/Sphere.h src/Image.cpp src/Image.h src/Light.cpp src/Light.h)
  

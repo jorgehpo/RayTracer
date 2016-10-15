@@ -8,6 +8,8 @@
 #include "stb_image_write.h"
 #include "utils.h"
 #include "Scene.h"
+#include "Image.h"
+#include "OrthographicCamera.h"
 
 // Shortcut to avoid Eigen:: and std:: everywhere, DO NOT USE IN .h
 using namespace std;
@@ -93,9 +95,17 @@ void part2()
 
 int main()
 {
+    //Camera positioned at 0,0,-5 looking at origin
+    OrthographicCamera c(Eigen::Vector3d(0,0,-5), Eigen::Vector3d(0,0,0), Eigen::Vector3d(0,1,0), 5, 5, 500, 500);
+
     Scene s;
-    part1();
-    part2();
+    //part1();
+    //part2();
+    Image i = s.render(c);
+
+    // Save to png
+    write_matrix_to_png(i.R, i.G, i.B, i.A, "teste.png");
+
 
     return 0;
 }

@@ -9,11 +9,11 @@
 #include "Ray.h"
 
 class Surface {
-protected:
-    Eigen::Vector4d color;
 public:
+    Eigen::Vector4d color;
     Surface(const Eigen::Vector4d color);
     virtual double intersect(const Ray &ray) = 0;
+    virtual Eigen::Vector3d normal(const Eigen::Vector3d point) = 0;
 };
 
 

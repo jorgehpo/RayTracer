@@ -24,3 +24,7 @@ double Sphere::intersect(const Ray &ray) {
         return (-z - sqrtDet)/dDotD;
     }
 }
+
+Eigen::Vector3d Sphere::normal(const Eigen::Vector3d point) {
+    return (point - center)/radius;
+}

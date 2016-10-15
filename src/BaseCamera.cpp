@@ -10,6 +10,13 @@ BaseCamera::BaseCamera(const Eigen::Vector3d position, const Eigen::Vector3d loo
     e = position;
     w = -(lookAt - position).normalized();
     v = up.normalized();
-    u = v.cross(w);
+    u = w.cross(v);
 }
 
+std::string BaseCamera::toImagePlaneString() {
+    std::ostringstream s;
+    s << "u: " << u.transpose();
+    s << std::endl << "v: " << v.transpose();
+    s << std::endl << "w: " << w.transpose() << std::endl;
+    return s.str();
+}

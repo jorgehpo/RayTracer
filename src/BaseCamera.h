@@ -8,19 +8,20 @@
 #include "Eigen/Core"
 #include "Eigen/Geometry"
 #include "Ray.h"
+#include <sstream>
 
 class BaseCamera {
 protected:
     Eigen::Vector3d position, lookAt, up;
     Eigen::Vector3d e, u, v, w; // e: position, u: right, v:up, w:back
-    Eigen::Vector3d l, r, t, b; //left, right, top, bottom
+    double l, r, t, b; //left, right, top, bottom
     double width, height; //width, height of the image plane
-    unsigned int nx, ny; //size of the image
 public:
+    unsigned int nx, ny; //size of the image
     BaseCamera(const Eigen::Vector3d position, const Eigen::Vector3d lookAt, const Eigen::Vector3d up,
                const double width, const double height, const unsigned int nx, const unsigned int ny);
 
-    virtual Ray ray(const unsigned int i, const unsigned int j) = 0;
+    std::string toImagePlaneString();
 };
 
 
