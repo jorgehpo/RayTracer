@@ -4,6 +4,5 @@
 
 #include "Surface.h"
 
-Surface::Surface(const Eigen::Vector4d surface_color, const Eigen::Vector4d specular_color, double specular_decay):
-        specular_color(specular_color), surface_color(surface_color), specular_decay(specular_decay) {
+Surface::Surface(std::shared_ptr<Material> material):material(material){
 }

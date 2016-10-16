@@ -5,9 +5,11 @@
 #ifndef RAYTRACER_SCENE_H
 #define RAYTRACER_SCENE_H
 
+#include "PerspectiveCamera.h"
 #include "OrthographicCamera.h"
 #include "Surface.h"
 #include "Sphere.h"
+#include "Material.h"
 #include "Image.h"
 #include "Eigen/Core"
 #include "Ray.h"
@@ -17,6 +19,7 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include <limits>
 
 class Scene{
     std::vector <std::shared_ptr<Surface>> surfaces;
@@ -28,7 +31,8 @@ class Scene{
 
 public:
     Scene();
-    Image render(OrthographicCamera camera);
+    template <typename C>
+    Image render(C camera);
     void setAmbient(Eigen::Vector4d color, double I);
 };
 

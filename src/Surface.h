@@ -7,12 +7,13 @@
 
 #include "Eigen/Core"
 #include "Ray.h"
+#include "Material.h"
+#include <memory>
 
 class Surface {
 public:
-    Eigen::Vector4d surface_color, specular_color;
-    double specular_decay;
-    Surface(const Eigen::Vector4d surface_color, const Eigen::Vector4d specular_color, double specular_decay);
+    std::shared_ptr<Material> material;
+    Surface(std::shared_ptr<Material> material);
     virtual double hit(const Ray &ray) = 0;
     virtual Eigen::Vector3d normal(const Eigen::Vector3d point) = 0;
 };

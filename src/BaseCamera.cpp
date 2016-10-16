@@ -11,6 +11,10 @@ BaseCamera::BaseCamera(const Eigen::Vector3d position, const Eigen::Vector3d loo
     w = -(lookAt - position).normalized();
     v = up.normalized();
     u = w.cross(v);
+    l = -width/2;
+    r = width/2;
+    t = -height/2; //flipped top and bottom because matrix image starts at top left corner.
+    b = height/2;
 }
 
 std::string BaseCamera::toImagePlaneString() {

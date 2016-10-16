@@ -4,9 +4,8 @@
 
 #include "Sphere.h"
 
-Sphere::Sphere(const Eigen::Vector3d center, const double radius, const Eigen::Vector4d surface_color,
-               const Eigen::Vector4d specular_color, const double specular_decay) :
-        center(center), radius(radius), Surface(surface_color, specular_color, specular_decay) {
+Sphere::Sphere(const Eigen::Vector3d center, const double radius, std::shared_ptr<Material> material) :
+        center(center), radius(radius), Surface(material) {
 }
 
 double Sphere::hit(const Ray &ray) {
