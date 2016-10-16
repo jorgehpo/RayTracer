@@ -10,9 +10,10 @@
 
 class Surface {
 public:
-    Eigen::Vector4d color;
-    Surface(const Eigen::Vector4d color);
-    virtual double intersect(const Ray &ray) = 0;
+    Eigen::Vector4d surface_color, specular_color;
+    double specular_decay;
+    Surface(const Eigen::Vector4d surface_color, const Eigen::Vector4d specular_color, double specular_decay);
+    virtual double hit(const Ray &ray) = 0;
     virtual Eigen::Vector3d normal(const Eigen::Vector3d point) = 0;
 };
 

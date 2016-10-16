@@ -9,9 +9,10 @@
 
 class Light {
 public:
-    double k_d;
-    Eigen::Vector4d color;
+    double I, p; //Intensity of light and power of specular decay
     Eigen::Vector3d position;
+    Eigen::Vector4d color;
+    Light(const double I, const Eigen::Vector3d position, const Eigen::Vector4d color);
 };
 
 

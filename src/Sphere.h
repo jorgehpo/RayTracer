@@ -12,8 +12,9 @@ class Sphere:public Surface {
     Eigen::Vector3d center;
     double radius;
 public:
-    Sphere(const Eigen::Vector3d center, const double radius, const Eigen::Vector4d color);
-    double intersect(const Ray &ray);
+    Sphere(const Eigen::Vector3d center, const double radius, const Eigen::Vector4d surface_color,
+               const Eigen::Vector4d specular_color, const double specular_decay);
+    double hit(const Ray &ray);
     Eigen::Vector3d normal(const Eigen::Vector3d point);
 };
 

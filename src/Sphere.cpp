@@ -4,11 +4,12 @@
 
 #include "Sphere.h"
 
-Sphere::Sphere(const Eigen::Vector3d center, const double radius, const Eigen::Vector4d color):
-        center(center), radius(radius), Surface(color) {
+Sphere::Sphere(const Eigen::Vector3d center, const double radius, const Eigen::Vector4d surface_color,
+               const Eigen::Vector4d specular_color, const double specular_decay) :
+        center(center), radius(radius), Surface(surface_color, specular_color, specular_decay) {
 }
 
-double Sphere::intersect(const Ray &ray) {
+double Sphere::hit(const Ray &ray) {
     //solution from Foundations of Computer Graphics, 4th edition, page 77
     Eigen::Vector3d originMinusCenter = ray.origin - center; // origin of ray minus center of sphere
     double z = ray.direction.dot(originMinusCenter);

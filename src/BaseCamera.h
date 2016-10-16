@@ -20,7 +20,7 @@ public:
     unsigned int nx, ny; //size of the image
     BaseCamera(const Eigen::Vector3d position, const Eigen::Vector3d lookAt, const Eigen::Vector3d up,
                const double width, const double height, const unsigned int nx, const unsigned int ny);
-
+    Eigen::Vector3d getPosition();
     std::string toImagePlaneString();
 };
 

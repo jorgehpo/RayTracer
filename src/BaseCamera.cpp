@@ -20,3 +20,7 @@ std::string BaseCamera::toImagePlaneString() {
     s << std::endl << "w: " << w.transpose() << std::endl;
     return s.str();
 }
+
+Eigen::Vector3d BaseCamera::getPosition() {
+    return position;
+}
