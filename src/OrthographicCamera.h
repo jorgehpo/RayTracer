@@ -14,7 +14,7 @@ class OrthographicCamera:public BaseCamera {
 public:
     OrthographicCamera(const Eigen::Vector3d position, const Eigen::Vector3d lookAt, const Eigen::Vector3d up, const double width=500,
                       const double height=500, const unsigned int nx=500, const unsigned int ny = 500);
-    Ray ray(const unsigned int i, const unsigned int j);
+    Ray ray(unsigned int i, unsigned int j);
 };
 
 

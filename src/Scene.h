@@ -5,8 +5,7 @@
 #ifndef RAYTRACER_SCENE_H
 #define RAYTRACER_SCENE_H
 
-#include "PerspectiveCamera.h"
-#include "OrthographicCamera.h"
+#include "BaseCamera.h"
 #include "Surface.h"
 #include "Sphere.h"
 #include "Material.h"
@@ -28,11 +27,11 @@ class Scene{
         Eigen::Vector4d color;
         double I;
     }ambient_light;
-
+    Eigen::Vector4d trace(Ray ray, unsigned int niter);
+    std::shared_ptr<BaseCamera> camera;
 public:
     Scene();
-    template <typename C>
-    Image render(C camera);
+    Image render(std::shared_ptr<BaseCamera> camera);
     void setAmbient(Eigen::Vector4d color, double I);
 };
 

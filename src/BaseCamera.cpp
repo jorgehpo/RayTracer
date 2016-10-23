@@ -17,14 +17,6 @@ BaseCamera::BaseCamera(const Eigen::Vector3d position, const Eigen::Vector3d loo
     b = height/2;
 }
 
-std::string BaseCamera::toImagePlaneString() {
-    std::ostringstream s;
-    s << "u: " << u.transpose();
-    s << std::endl << "v: " << v.transpose();
-    s << std::endl << "w: " << w.transpose() << std::endl;
-    return s.str();
-}
-
 Eigen::Vector3d BaseCamera::getPosition() {
     return position;
 }

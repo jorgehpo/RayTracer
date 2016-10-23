@@ -10,7 +10,7 @@ PerspectiveCamera::PerspectiveCamera(const Eigen::Vector3d position, const Eigen
         BaseCamera(position, lookAt, up, width, height, nx, ny), d(d){
 }
 
-Ray PerspectiveCamera::ray(const unsigned int i, const unsigned int j){
+Ray PerspectiveCamera::ray(unsigned int i, unsigned int j){
     double _u, _v;
     _u = l + (r-l)*(i + 0.5)/nx;
     _v = b + (t-b)*(j + 0.5)/ny;
