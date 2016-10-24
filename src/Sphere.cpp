@@ -15,14 +15,10 @@ double Sphere::hit(const Ray &ray) {
     double dDotD = ray.direction.dot(ray.direction);
     double discriminant = z*z - dDotD * (originMinusCenter.dot(originMinusCenter) - radius*radius);
     if (discriminant < 0){
-        return -1;
+        return -1.0;
     }
     double sqrtDet = sqrt(discriminant);
-    if (z*z > sqrtDet){
-        return (-z - sqrtDet)/dDotD;
-    }else{
-        return (-z - sqrtDet)/dDotD;
-    }
+    return (-z - sqrtDet)/dDotD;
 }
 
 Eigen::Vector3d Sphere::normal(const Eigen::Vector3d point) {

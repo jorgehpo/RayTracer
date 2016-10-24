@@ -45,10 +45,31 @@ double Triangle::hit(const Ray &ray){
     l = za - ze;
     m = a*(e*i - h*f) + b*(g*f - d*i) + c*(d*h - e*g);
 
+    if (m == 0) return -1;
+
     t = - (f*(a*k-j*b) + e*(j*c - a*l) + d*(b*l - k*c))/m;
 
     beta = (j*(e*i - h*f) + k*(g*f - d*i) + l*(d*h - e*g))/m;
     gamma = (i*(a*k-j*b) + h*(j*c - a*l) + g*(b*l-k*c))/m;
-    alpha = beta - gamma;
-    return 1;
+
+    if (gamma < 0 || gamma > 1)
+        return -1;
+
+    if (beta < 0 || beta > 1-gamma)
+        return -1;
+
+    return t;
+}
+
+Eigen::Vector3d Triangle::normal(const Eigen::Vector3d point) {
+    Eigen::Vector3d na,nb;
+    Eigen::Vector3d n  = (p2-p1).cross(p3-p1);
+    double alpha, beta, gamma;
+    double sqnorm = n.squaredNorm();
+    na = (p3-p2).cross(point-p2);
+    nb = (p1-p3).cross(point-p3);
+    alpha = n.dot(na)/sqnorm;
+    beta = n.dot(nb)/sqnorm;
+    gamma = 1 - alpha - beta;
+    return (alpha * n1 + beta * n2 + gamma * n3).normalized();
 }

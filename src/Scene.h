@@ -11,6 +11,7 @@
 #include "Material.h"
 #include "Image.h"
 #include "Eigen/Core"
+#include <Eigen/Dense>
 #include "Ray.h"
 #include "Light.h"
 #include <cmath>
@@ -19,6 +20,10 @@
 #include <iostream>
 #include <algorithm>
 #include <limits>
+#include <thread>
+#include "Triangle.h"
+#include "OFFLoader.h"
+
 
 class Scene{
     std::vector <std::shared_ptr<Surface>> surfaces;
@@ -27,7 +32,7 @@ class Scene{
         Eigen::Vector4d color;
         double I;
     }ambient_light;
-    Eigen::Vector4d trace(Ray ray, unsigned int niter);
+    Eigen::Vector4d rayColor(Ray ray, unsigned int niter);
     std::shared_ptr<BaseCamera> camera;
 public:
     Scene();

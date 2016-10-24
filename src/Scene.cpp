@@ -16,33 +16,77 @@ Scene::Scene(){
     std::shared_ptr<Material> mGreen = std::make_shared<Material>(Eigen::Vector4d(0.0, 1.0, 0, 1),
                                                                  Eigen::Vector4d(0.7, 0.7, 0.7, 1), 10);
 
-    surfaces.push_back(std::make_shared<Sphere>(Eigen::Vector3d(1, 1, 0), 0.8, mRed));
+
+    //surfaces.push_back(std::make_shared<Triangle>(Eigen::Vector3d(0,0,0), Eigen::Vector3d(1,0,0), Eigen::Vector3d(1,1,0), mRed));
+
+
+    /*surfaces.push_back(std::make_shared<Sphere>(Eigen::Vector3d(1, 1, 0), 0.8, mRed));
 
     surfaces.push_back(std::make_shared<Sphere>(Eigen::Vector3d(-1, -1, 0), 0.8, mBlue));
 
-    surfaces.push_back(std::make_shared<Sphere>(Eigen::Vector3d(-1, 1, 0), 0.8, mGreen));
+    surfaces.push_back(std::make_shared<Sphere>(Eigen::Vector3d(-1, 1, 0), 0.8, mGreen));*/
 
     lights.push_back(std::make_shared<Light>(1, Eigen::Vector3d(-5, 5, -5), Eigen::Vector4d(1, 1, 1, 1)));
 
     lights.push_back(std::make_shared<Light>(1, Eigen::Vector3d( 5, 5, 5), Eigen::Vector4d(1, 1, 1, 1)));
+
+    lights.push_back(std::make_shared<Light>(1, Eigen::Vector3d( 0, -10,-0), Eigen::Vector4d(1, 1, 1, 1)));
+
+    Eigen::Matrix4d transform = Eigen::MatrixXd::Identity(4,4);
+    OFFLoader offloader;
+    std::vector<std::shared_ptr<Triangle>> triangles = offloader.loadOFFMesh("/Users/jorgehpo/Desktop/monkey.off", transform, mRed);
+    surfaces.insert(surfaces.end(), triangles.begin(), triangles.end());
+
 }
 
 
 Image Scene::render(std::shared_ptr<BaseCamera> camera) {
     this->camera = camera;
+
+    std::vector<std::thread> threads;
+
     Image image(camera->nx, camera->ny);
 
-    unsigned int i, j;
+    unsigned int n_threads = std::thread::hardware_concurrency();
 
-    for (i = 0; i < camera->nx; ++i){
-        for (j = 0; j < camera->ny; ++j){
-            Ray ray = camera->ray(i,j);
-            Eigen::Vector4d c = trace(ray, 1);
-            image.R(i,j) = c(0);
-            image.G(i,j) = c(1);
-            image.B(i,j) = c(2);
+    std::cout << "n_threads = " << n_threads;
+
+    /* Algorithm for subdividing an array into “semi-equal”, uniform sub-arrays
+     *
+     * http://stackoverflow.com/questions/8084010/algorithm-for-subdividing-an-array-into-semi-equal-uniform-sub-arrays
+     *
+     * If your language has integer division that truncates,
+     * an easy way to compute the size of section i is via (N*i+N)/M - (N*i)/M.
+     * For example, the python program
+     * N=100;M=12
+     * for i in range(M): print (N*i+N)/M - (N*i)/M
+     * outputs the numbers 8 8 9 8 8 9 8 8 9 8 8 9
+     *
+     */
+
+
+    auto render_t = [this, n_threads, &image](int t){
+        unsigned int begin = (this->camera->nx * t)/n_threads;
+        unsigned int end = (this->camera->nx * (t+1))/n_threads;
+
+        for (unsigned int i = begin; i < end; ++i){
+            for (unsigned int j = 0; j < this->camera->ny; ++j){
+                Ray ray = this->camera->ray(i,j);
+                Eigen::Vector4d c = this->rayColor(ray, 1);
+                image.R(i,j) = c(0);
+                image.G(i,j) = c(1);
+                image.B(i,j) = c(2);
+            }
         }
+    };
+
+    for (unsigned int t = 0; t < n_threads; t++){
+        threads.push_back(std::thread(render_t, t));
     }
+
+    for ( std::thread& t : threads)
+        t.join();
+
     return image;
 }
 
@@ -51,7 +95,7 @@ void Scene::setAmbient(Eigen::Vector4d color, double I) {
     ambient_light.I = I;
 }
 
-Eigen::Vector4d Scene::trace(Ray ray, unsigned int niter) {
+Eigen::Vector4d Scene::rayColor(Ray ray, unsigned int niter) {
     if (niter-- > 0){
         double t = std::numeric_limits<double>::infinity();
         std::shared_ptr<Surface> s;

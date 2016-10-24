@@ -19,6 +19,7 @@ private:
 public:
     Triangle(Eigen::Vector3d p1, Eigen::Vector3d p2, Eigen::Vector3d p3, std::shared_ptr<Material> material);
     double hit(const Ray &ray);
+    Eigen::Vector3d normal(const Eigen::Vector3d point);
 };
 
 
