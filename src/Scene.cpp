@@ -34,7 +34,7 @@ Scene::Scene(){
 
     Eigen::Matrix4d transform = Eigen::MatrixXd::Identity(4,4);
     OFFLoader offloader;
-    std::vector<std::shared_ptr<Triangle>> triangles = offloader.loadOFFMesh("/Users/jorgehpo/Desktop/monkey.off", transform, mRed);
+    std::vector<std::shared_ptr<Triangle>> triangles = offloader.loadOFFMesh("bunny.off", transform, mRed);
     surfaces.insert(surfaces.end(), triangles.begin(), triangles.end());
 
 }

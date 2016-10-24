@@ -10,7 +10,7 @@
 #include "Material.h"
 #include "Ray.h"
 #include <memory>
-#include <Eigen/core>
+#include <Eigen/Core>
 #include <Eigen/Geometry>
 
 class Triangle: public Surface {

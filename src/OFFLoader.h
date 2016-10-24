@@ -7,7 +7,7 @@
 
 #include <memory>
 #include "Triangle.h"
-#include "Eigen/core"
+#include "Eigen/Core"
 #include <fstream>
 #include <vector>
 #include "Material.h"
