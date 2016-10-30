@@ -17,25 +17,22 @@ Scene::Scene(){
                                                                  Eigen::Vector4d(0.7, 0.7, 0.7, 1), 10);
 
 
-    //surfaces.push_back(std::make_shared<Triangle>(Eigen::Vector3d(0,0,0), Eigen::Vector3d(1,0,0), Eigen::Vector3d(1,1,0), mRed));
-
-
-    /*surfaces.push_back(std::make_shared<Sphere>(Eigen::Vector3d(1, 1, 0), 0.8, mRed));
+    surfaces.push_back(std::make_shared<Sphere>(Eigen::Vector3d(1, 1, 0), 0.8, mRed));
 
     surfaces.push_back(std::make_shared<Sphere>(Eigen::Vector3d(-1, -1, 0), 0.8, mBlue));
 
-    surfaces.push_back(std::make_shared<Sphere>(Eigen::Vector3d(-1, 1, 0), 0.8, mGreen));*/
+    surfaces.push_back(std::make_shared<Sphere>(Eigen::Vector3d(-1, 1, 0), 0.8, mGreen));
 
-    lights.push_back(std::make_shared<Light>(1, Eigen::Vector3d(-5, 5, -5), Eigen::Vector4d(1, 1, 1, 1)));
+    lights.push_back(std::make_shared<Light>(1, Eigen::Vector3d(-5, 15, -5), Eigen::Vector4d(1, 1, 1, 1)));
 
-    lights.push_back(std::make_shared<Light>(1, Eigen::Vector3d( 5, 5, 5), Eigen::Vector4d(1, 1, 1, 1)));
+    lights.push_back(std::make_shared<Light>(1, Eigen::Vector3d( 15, 5, 5), Eigen::Vector4d(1, 1, 1, 1)));
 
     lights.push_back(std::make_shared<Light>(1, Eigen::Vector3d( 0, -10,-0), Eigen::Vector4d(1, 1, 1, 1)));
 
-    Eigen::Matrix4d transform = Eigen::MatrixXd::Identity(4,4);
-    OFFLoader offloader;
-    std::vector<std::shared_ptr<Triangle>> triangles = offloader.loadOFFMesh("bunny.off", transform, mRed);
-    surfaces.insert(surfaces.end(), triangles.begin(), triangles.end());
+    //Eigen::Matrix4d transform = Eigen::MatrixXd::Identity(4,4);
+    //OFFLoader offloader;
+    //std::vector<std::shared_ptr<Triangle>> triangles = offloader.loadOFFMesh("bunny.off", transform, mRed);
+   // surfaces.insert(surfaces.end(), triangles.begin(), triangles.end());
 
 }
 
@@ -73,9 +70,9 @@ Image Scene::render(std::shared_ptr<BaseCamera> camera) {
             for (unsigned int j = 0; j < this->camera->ny; ++j){
                 Ray ray = this->camera->ray(i,j);
                 Eigen::Vector4d c = this->rayColor(ray, 1);
-                image.R(i,j) = c(0);
-                image.G(i,j) = c(1);
-                image.B(i,j) = c(2);
+                image.R(i,j) = (c(0) > 1? 1: c(0));
+                image.G(i,j) = (c(1) > 1? 1: c(1));
+                image.B(i,j) = (c(2) > 1? 1: c(2));
             }
         }
     };
@@ -115,9 +112,21 @@ Eigen::Vector4d Scene::rayColor(Ray ray, unsigned int niter) {
                 Eigen::Vector3d l = ((*light)->position - p).normalized();
                 Eigen::Vector3d v = (camera->getPosition() - p).normalized();
                 Eigen::Vector3d h = (v + l).normalized();
-                c = c + (*light)->I * (*light)->color.cwiseProduct(s->material->surface_color) * std::max(0.0, n.dot(l)) + \
-                (*light)->I * (*light)->color.cwiseProduct(s->material->specular_color) * std::pow(std::max(0.0, n.dot(h)), s->material->specular_decay) + \
-                ambient_light.color.cwiseProduct(s->material->surface_color)*ambient_light.I;
+                Eigen::Vector3d p2 = p + l*1e-10;
+                bool hit = false;
+                Ray ray_light(p2,l);
+                for (auto object = surfaces.begin(); object != surfaces.end(); ++object){
+                    double _t = (*object)->hit(ray_light);
+                    if (_t > 0){
+                        hit = true;
+                        break;
+                    }
+                }
+                if (!hit){
+                    c = c + (*light)->I * (*light)->color.cwiseProduct(s->material->surface_color) * std::max(0.0, n.dot(l)) + \
+                    (*light)->I * (*light)->color.cwiseProduct(s->material->specular_color) * std::pow(std::max(0.0, n.dot(h)), s->material->specular_decay) + \
+                    ambient_light.color.cwiseProduct(s->material->surface_color)*ambient_light.I;
+                }
             }
 
             return c;
