@@ -8,26 +8,32 @@ Scene::Scene(){
     ambient_light.color = Eigen::Vector4d(1,1,1,1);
     ambient_light.I = 0.1;
     std::shared_ptr<Material> mRed = std::make_shared<Material>(Eigen::Vector4d(1.0, 0, 0, 1),
-                                                             Eigen::Vector4d(0.7, 0.7, 0.7, 1), 10);
+                                                             Eigen::Vector4d(0.7, 0.7, 0.7, 1), 100, .3);
 
     std::shared_ptr<Material> mBlue = std::make_shared<Material>(Eigen::Vector4d(0.0, 0, 1.0, 1),
-                                                             Eigen::Vector4d(0.7, 0.7, 0.7, 1), 10);
+                                                             Eigen::Vector4d(0.7, 0.7, 0.7, 1), 100, .3);
 
     std::shared_ptr<Material> mGreen = std::make_shared<Material>(Eigen::Vector4d(0.0, 1.0, 0, 1),
-                                                                 Eigen::Vector4d(0.7, 0.7, 0.7, 1), 10);
+                                                                 Eigen::Vector4d(0.7, 0.7, 0.7, 1), 100, .3);
+
+    std::shared_ptr<Material> mGray = std::make_shared<Material>(Eigen::Vector4d(0.6, 0.6, 0.6, 1),
+                                                                  Eigen::Vector4d(0.3, 0.3, 0.3, 1), 100, .7);
 
 
-    surfaces.push_back(std::make_shared<Sphere>(Eigen::Vector3d(1, 1, 0), 0.8, mRed));
+    surfaces.push_back(std::make_shared<Sphere>(Eigen::Vector3d(1, 1, 5), 0.8, mRed));
 
-    surfaces.push_back(std::make_shared<Sphere>(Eigen::Vector3d(-1, -1, 0), 0.8, mBlue));
+    surfaces.push_back(std::make_shared<Sphere>(Eigen::Vector3d(-1, 2, 3), 0.8, mBlue));
 
     surfaces.push_back(std::make_shared<Sphere>(Eigen::Vector3d(-1, 1, 0), 0.8, mGreen));
 
-    lights.push_back(std::make_shared<Light>(1, Eigen::Vector3d(-5, 15, -5), Eigen::Vector4d(1, 1, 1, 1)));
+    lights.push_back(std::make_shared<Light>(0.5, Eigen::Vector3d(-5, 15, -5), Eigen::Vector4d(1, 1, 1, 1)));
 
-    lights.push_back(std::make_shared<Light>(1, Eigen::Vector3d( 15, 5, 5), Eigen::Vector4d(1, 1, 1, 1)));
+    //lights.push_back(std::make_shared<Light>(1, Eigen::Vector3d( 15, 5, 5), Eigen::Vector4d(1, 1, 1, 1)));
 
-    lights.push_back(std::make_shared<Light>(1, Eigen::Vector3d( 0, -10,-0), Eigen::Vector4d(1, 1, 1, 1)));
+    lights.push_back(std::make_shared<Light>(1, Eigen::Vector3d( -3, 10,-3), Eigen::Vector4d(1, 1, 1, 1)));
+
+    surfaces.push_back(std::make_shared<Triangle>(Eigen::Vector3d (-20,-1.5,-20), Eigen::Vector3d (20,-1.5,-20), Eigen::Vector3d (20,-1.5,20), mGray));
+    surfaces.push_back(std::make_shared<Triangle>(Eigen::Vector3d (-20,-1.5,20), Eigen::Vector3d (-20,-1.5,-20), Eigen::Vector3d (20,-1.5,20), mGray));
 
     //Eigen::Matrix4d transform = Eigen::MatrixXd::Identity(4,4);
     //OFFLoader offloader;
@@ -37,7 +43,7 @@ Scene::Scene(){
 }
 
 
-Image Scene::render(std::shared_ptr<BaseCamera> camera) {
+Image Scene::render(std::shared_ptr<BaseCamera> camera, unsigned int raytracing_depth) {
     this->camera = camera;
 
     std::vector<std::thread> threads;
@@ -69,7 +75,7 @@ Image Scene::render(std::shared_ptr<BaseCamera> camera) {
         for (unsigned int i = begin; i < end; ++i){
             for (unsigned int j = 0; j < this->camera->ny; ++j){
                 Ray ray = this->camera->ray(i,j);
-                Eigen::Vector4d c = this->rayColor(ray, 1);
+                Eigen::Vector4d c = this->rayColor(ray, 15);
                 image.R(i,j) = (c(0) > 1? 1: c(0));
                 image.G(i,j) = (c(1) > 1? 1: c(1));
                 image.B(i,j) = (c(2) > 1? 1: c(2));
@@ -93,45 +99,47 @@ void Scene::setAmbient(Eigen::Vector4d color, double I) {
 }
 
 Eigen::Vector4d Scene::rayColor(Ray ray, unsigned int niter) {
-    if (niter-- > 0){
-        double t = std::numeric_limits<double>::infinity();
-        std::shared_ptr<Surface> s;
-        for (auto object = surfaces.begin(); object != surfaces.end(); ++object){
-            double _t = (*object)->hit(ray);
-            if (_t >= 0 && _t < t){
-                t = _t;
-                s = *object;
-            }
+    double t = std::numeric_limits<double>::infinity();
+    std::shared_ptr<Surface> s;
+    for (auto object = surfaces.begin(); object != surfaces.end(); ++object){
+        double _t = (*object)->hit(ray);
+        if (_t >= 0 && _t < t){
+            t = _t;
+            s = *object;
         }
-        if (s){ //if object is not null
-            Eigen::Vector3d p = ray.origin + ray.direction * t;
-            Eigen::Vector3d n = s->normal(p);
-            Eigen::Vector4d c(0,0,0,0);
+    }
+    if (s){ //if object is not null
+        Eigen::Vector3d p = ray.origin + ray.direction * t;
+        Eigen::Vector3d n = s->normal(p);
+        Eigen::Vector4d c(0,0,0,0);
 
-            for (auto light = lights.begin(); light != lights.end(); ++light){
-                Eigen::Vector3d l = ((*light)->position - p).normalized();
-                Eigen::Vector3d v = (camera->getPosition() - p).normalized();
-                Eigen::Vector3d h = (v + l).normalized();
-                Eigen::Vector3d p2 = p + l*1e-10;
-                bool hit = false;
-                Ray ray_light(p2,l);
-                for (auto object = surfaces.begin(); object != surfaces.end(); ++object){
-                    double _t = (*object)->hit(ray_light);
-                    if (_t > 0){
-                        hit = true;
-                        break;
-                    }
-                }
-                if (!hit){
-                    c = c + (*light)->I * (*light)->color.cwiseProduct(s->material->surface_color) * std::max(0.0, n.dot(l)) + \
-                    (*light)->I * (*light)->color.cwiseProduct(s->material->specular_color) * std::pow(std::max(0.0, n.dot(h)), s->material->specular_decay) + \
-                    ambient_light.color.cwiseProduct(s->material->surface_color)*ambient_light.I;
+        for (auto light = lights.begin(); light != lights.end(); ++light){
+            Eigen::Vector3d l = ((*light)->position - p).normalized();
+            Eigen::Vector3d v = (camera->getPosition() - p).normalized();
+            Eigen::Vector3d h = (v + l).normalized();
+            Eigen::Vector3d p2 = p + l*1e-10;
+            bool hit = false;
+            Ray ray_light(p2,l);
+            for (auto object = surfaces.begin(); object != surfaces.end(); ++object){
+                double _t = (*object)->hit(ray_light);
+                if (_t > 0){
+                    hit = true;
+                    break;
                 }
             }
-
-            return c;
+            if (!hit){
+                c = c + (*light)->I * (*light)->color.cwiseProduct(s->material->surface_color) * std::max(0.0, n.dot(l)) + \
+                (*light)->I * (*light)->color.cwiseProduct(s->material->specular_color) * std::pow(std::max(0.0, n.dot(h)), s->material->specular_decay);
+                if (s->material->reflection_constant > 0 && niter > 1){
+                    Eigen::Vector3d reflection_direction = ray.direction - 2 * (ray.direction.dot(n)) *n;
+                    Eigen::Vector3d reflection_p = p + reflection_direction * 1e-10;
+                    Ray r {reflection_p, reflection_direction};
+                    c = c  + s->material->reflection_constant*rayColor(r, niter-1);
+                }
+            }
         }
-
+        c = c +  ambient_light.color.cwiseProduct(s->material->surface_color)*ambient_light.I;
+        return c;
     }
     return Eigen::Vector4d(0,0,0,0);
 }

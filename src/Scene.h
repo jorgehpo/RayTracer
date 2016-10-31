@@ -36,7 +36,7 @@ class Scene{
     std::shared_ptr<BaseCamera> camera;
 public:
     Scene();
-    Image render(std::shared_ptr<BaseCamera> camera);
+    Image render(std::shared_ptr<BaseCamera> camera, unsigned int raytracing_depth);
     void setAmbient(Eigen::Vector4d color, double I);
 };
 

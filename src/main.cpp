@@ -16,12 +16,12 @@ using namespace Eigen;
 
 int main()
 {
-    auto c = make_shared<PerspectiveCamera>(Eigen::Vector3d(-1, 0, -5), Eigen::Vector3d(0,0,0), Eigen::Vector3d(0,1,0), 5,  5, 5, 1000, 1000);
+    auto c = make_shared<PerspectiveCamera>(Eigen::Vector3d(5, 5, -7), Eigen::Vector3d(0,0,0), Eigen::Vector3d(0,1,0), 5,  5, 5, 1000, 1000);
     //auto c = make_shared<OrthographicCamera>(Eigen::Vector3d(0, -3, 0), Eigen::Vector3d(0,0,0), Eigen::Vector3d(0,1,1), 5,  5, 1000, 1000);
 
     Scene s;
 
-    Image i = s.render(c);
+    Image i = s.render(c,20);
 
     // Save to png
     write_matrix_to_png(i.R, i.G, i.B, i.A, "teste.png");

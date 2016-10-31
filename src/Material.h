@@ -10,9 +10,10 @@
 class Material {
 public:
     Eigen::Vector4d surface_color, specular_color;
-    double specular_decay;
+    double specular_decay, reflection_constant;
     Material();
-    Material(const Eigen::Vector4d surface_color, const Eigen::Vector4d specular_color, const double specular_decay);
+    Material( Eigen::Vector4d surface_color,  Eigen::Vector4d specular_color,  double specular_decay,
+                 double reflection_constant=0);
 };
 
 

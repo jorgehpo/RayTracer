@@ -8,7 +8,7 @@ Triangle::Triangle(Eigen::Vector3d p1, Eigen::Vector3d p2, Eigen::Vector3d p3, s
     Eigen::Vector3d u,v;
     u = p2 - p1;
     v = p3 - p1;
-    n1 = u.cross(v);
+    n1 = u.cross(v).normalized();
     n2 = n1;
     n3 = n1;
 }
